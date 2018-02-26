@@ -6,7 +6,6 @@ import common.FileUtil;
 
 public class ModelParams {
 	int T;
-	int S;
 	int U;
 	int V;
 	int P;
@@ -29,11 +28,8 @@ public class ModelParams {
 //			System.out.println("key == " + key);
 //			System.out.println("value == " + value);
 			switch(key) {
-			case "serious_topics":
+			case "topics":
 				this.T = Integer.parseInt(value);
-				break;
-			case "unserious_topics":
-				this.S = Integer.parseInt(value);
 				break;
 			case "alpha":
 				this.alpha = Float.parseFloat(value);
@@ -66,8 +62,7 @@ public class ModelParams {
 	
 	public void showParams() {
 		System.out.println("==================================");
-		System.out.println("serious_topics: " + Integer.toString(this.T));
-		System.out.println("unserious_topics: " + Integer.toString(this.S));
+		System.out.println("topics: " + Integer.toString(this.T));
 		System.out.println("alpha: " + Float.toString(this.alpha));
 		System.out.println("beta: " + Float.toString(this.beta));
 		System.out.println("gamma: " + Float.toString(this.gamma));

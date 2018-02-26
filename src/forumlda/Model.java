@@ -67,7 +67,6 @@ public class Model {
 		this.topNum = modelParams.topNum;
 		
 		this.T = modelParams.T;
-		this.S = modelParams.S;
 		this.V = modelParams.V;
 		this.U = modelParams.U;
 		this.P = this.posts.size();

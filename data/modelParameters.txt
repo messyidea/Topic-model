@@ -1,5 +1,4 @@
-serious_topics:10
-unserious_topics:5
+topics:10
 alpha:0.1
 beta:0.1
 gamma:20
