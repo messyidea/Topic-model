@@ -2,6 +2,10 @@ package common;
 
 public class MathUtil {
 	public static int sample(double[] raw) {
+//		for (int i = 0; i < raw.length; ++i) {
+//			System.out.print("  " + raw[i]);
+//		}
+//		System.out.println();
 		for (int i = 1; i < raw.length; ++i) {
             raw[i] += raw[i] + raw[i - 1];
         }

@@ -358,6 +358,8 @@ public class Model {
 			rstT = true;
 		}
 		
+		t[p][s][n] = rstT;
+		
 		// recover
 		if (rstT == true) {
 			this.countU2W[u][1] ++;
@@ -395,12 +397,22 @@ public class Model {
 				if (rstR) {
 					this.countTW[rstZ] --;
 					this.countTVW[rstZ][word] --;
+					if (countTVW[rstZ][word] < 0) {
+						System.out.println("???????????????");
+						System.out.println(rstZ);
+						System.out.println(word);
+						System.out.println(this.countTVW[rstZ][word]);
+						System.exit(1);
+					}
 				} else {
 					this.countWr --;
 					this.countVWr[word] --;
 				}
 			}
+			
 		}
+		
+		
 
 		int rst = drawReply(p, w, content);
 		
@@ -412,6 +424,9 @@ public class Model {
 			rstZ = (short)rst;
 		}
 		
+//		System.out.println(rst);
+//		System.out.println(rstR);
+//		System.out.println(rstZ);
 		r[p][w] = rstR;
 		z[p][w] = rstZ;
 
@@ -465,6 +480,9 @@ public class Model {
 			topicP[i] = (countU2S[u][1] + gamma[1])
 					* (countPTS[p][i] + alpha[i])
 					/ (countPS[p] + alphaSum);
+			
+//			System.out.println("------");
+//			System.out.println("  " + topicP[i]);
 
 			int t = 0;
 			Set s = wordCnt.entrySet();
@@ -477,10 +495,27 @@ public class Model {
 				int count = (Integer) m.getValue();
 				for (int j = 0; j < count; ++j) {
 					double value = (countTVW[i][word] + beta[word] + j) / (countTW[i] + betaSum + t);
+//					if (value < 0) {
+//						System.out.println("value < 0");
+//						System.out.println(countTW[i]);
+//						System.out.println(countTVW[i][word]);
+//						System.out.println(beta[word]);
+//						System.out.println(betaSum);
+//					}
 					t++;
 					// System.out.println("value == " + value);
+//					System.out.println("----" + value);
+//					System.out.println("====" + bufferP);
+//					double bef = bufferP;
 					bufferP *= value;
+//					double bef2 = bufferP;
 					bufferP = isOverFlow(bufferP, pCount, i);
+//					if (!Double.isFinite(bufferP)) {
+//						System.out.println("----value  " + value);
+//						System.out.println("----bef  " + bef);
+//						System.out.println("----bef2  " + bef2);
+//						System.out.println("====bufferP  " + bufferP);
+//					}
 					// System.out.println("buffer P == " + bufferP);
 				}
 			}
@@ -503,12 +538,18 @@ public class Model {
 				for (int j = 0; j < count; ++j) {
 					double value = (countVWr[word] + rbeta[word] + j) / (countWr + rbetaSum + t);
 					t++;
+//					System.out.println("----" + value);
+//					System.out.println("----" + bufferP);
 					bufferP *= value;
 					bufferP = isOverFlow(bufferP, pCount, T);
 				}
 			}
 			topicP[T] *= Math.pow(bufferP, 1.0);
 		}
+//		for (int i = 0; i < T + 1; ++i) {
+//			System.out.print(" " + topicP[i]);
+//		}
+//		System.out.println();
 
 		reComputeProbs(topicP, pCount);
 
@@ -544,6 +585,7 @@ public class Model {
 	}
 
 	private double isOverFlow(double bufferP, int[] pCount, int i) {
+//		System.out.println("before  " + bufferP);
 		if (bufferP > 1e150) {
 			pCount[i]++;
 			return bufferP / 1e150;
@@ -552,6 +594,7 @@ public class Model {
 			pCount[i]--;
 			return bufferP * 1e150;
 		}
+//		System.out.println("after  " + bufferP);
 		return bufferP;
 	}
 
