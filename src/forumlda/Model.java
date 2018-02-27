@@ -553,32 +553,45 @@ public class Model {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filename)));
 		ArrayList<Integer> rankList = new ArrayList<Integer>();
 
-		writer.write("Serious topics: \n");
+		writer.write("topics: \n");
 		for (int i = 0; i < T; ++i) {
 			writer.write("topic " + i + " -------------------- \n");
 			rankList.clear();
 
-			ComUtil.getTop(tphi[i], rankList, topNum);
+			ComUtil.getTop(phi[i], rankList, topNum);
 
 			for (int j = 0; j < rankList.size(); ++j) {
 				// System.out.println("ranklist " + j + " == " +
 				// rankList.get(j));
-				String tmp = "\t" + wordList.get(rankList.get(j)) + "\t" + tphi[i][rankList.get(j)];
+				String tmp = "\t" + wordList.get(rankList.get(j)) + "\t" + phi[i][rankList.get(j)];
 				writer.write(tmp + "\n");
 			}
 		}
 
-		writer.write("Unserious topics: \n");
-		for (int i = 0; i < S; ++i) {
-			writer.write("topic " + i + " -------------------- \n");
+		writer.write("rubbish words: \n");
+		for (int i = 0; i < 1; ++i) {
 			rankList.clear();
 
-			ComUtil.getTop(sphi[i], rankList, topNum);
+			ComUtil.getTop(rphi, rankList, topNum);
 
 			for (int j = 0; j < rankList.size(); ++j) {
 				// System.out.println("ranklist " + j + " == " +
 				// rankList.get(j));
-				String tmp = "\t" + wordList.get(rankList.get(j)) + "\t" + sphi[i][rankList.get(j)];
+				String tmp = "\t" + wordList.get(rankList.get(j)) + "\t" + rphi[rankList.get(j)];
+				writer.write(tmp + "\n");
+			}
+		}
+		
+		writer.write("background words: \n");
+		for (int i = 0; i < 1; ++i) {
+			rankList.clear();
+
+			ComUtil.getTop(bphi, rankList, topNum);
+
+			for (int j = 0; j < rankList.size(); ++j) {
+				// System.out.println("ranklist " + j + " == " +
+				// rankList.get(j));
+				String tmp = "\t" + wordList.get(rankList.get(j)) + "\t" + bphi[rankList.get(j)];
 				writer.write(tmp + "\n");
 			}
 		}
