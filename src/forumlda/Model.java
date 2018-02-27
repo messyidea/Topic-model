@@ -44,8 +44,8 @@ public class Model {
 	float[] bphi;
 	float[] rphi;
 
-	float[] pi;
-	float[] eta;
+	float[][] pi;
+	float[][] eta;
 
 	// int[][] countPTW; // only for root post
 	// int[][] countTVW;
@@ -124,11 +124,13 @@ public class Model {
 			this.rphi[i] = 0;
 		}
 
-		this.pi = new float[2];
-		this.eta = new float[2];
-		for (int i = 0; i < 2; ++i) {
-			this.pi[i] = 0;
-			this.eta[i] = 0;
+		this.pi = new float[U][2];
+		this.eta = new float[U][2];
+		for (int i = 0; i < U; ++i) {
+			for (int j = 0; j < 2; ++j) {
+				this.pi[i][j] = 0;
+				this.eta[i][j] = 0;
+			}
 		}
 
 	}
