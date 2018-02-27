@@ -53,7 +53,9 @@ public class Model {
 	int[] countTW;
 	int[][] countTVW;
 	int countWr;
+	int countWb;
 	int[] countVWr;
+	int[] countVWb;
 	int[][] countU2W;
 	
 
@@ -127,8 +129,10 @@ public class Model {
 		this.bphi = new float[V];
 		this.rphi = new float[V];
 		this.countVWr = new int[V];
+		this.countVWb = new int[V];
 		for (int i = 0; i < V; ++i) {
 			this.countVWr[i] = 0;
+			this.countVWb[i] = 0;
 			this.bphi[i] = 0;
 			this.rphi[i] = 0;
 		}
@@ -147,6 +151,7 @@ public class Model {
 		}
 		
 		this.countWr = 0;
+		this.countWb = 0;
 
 	}
 
@@ -200,6 +205,8 @@ public class Model {
 							t[i][j][k] = false;
 							// background word
 							this.countU2W[reply.author][0] ++;
+							this.countVWb[word] ++;
+							this.countWb ++;
 						} else {
 							t[i][j][k] = true;
 							this.countTW[tp] ++;
@@ -217,10 +224,13 @@ public class Model {
 						if (rand < 0.5) {
 							t[i][j][k] = false;
 							this.countU2W[reply.author][0] ++;
+							this.countVWb[word] ++;
+							this.countWb ++;
 						} else {
 							t[i][j][k] = true;
 							this.countWr ++;
 							this.countVWr[word] ++;
+							this.countU2W[reply.author][1] ++;
 						}
 
 					}
@@ -252,40 +262,29 @@ public class Model {
 		System.out.println("Start update distribution.");
 		for (int i = 0; i < P; ++i) {
 			for (int j = 0; j < T; ++j) {
-				ztheta[i][j] = (countPTW[i][j] + countPTR[i][j] + zalpha[j])
-						/ (posts.get(i).contents.get(0).content.length + posts.get(i).contents.size() - 1 + zalphaSum);
+				this.theta[i][j] = (countPTS[i][j] + alpha[j])
+						/ (countPS[i] + alphaSum);
 			}
 		}
-
-		for (int i = 0; i < S; ++i) {
-			for (int j = 0; j < V; ++j) {
-				sphi[i][j] = (countSVW[i][j] + sbeta[j]) / (countSW[i] + sbetaSum);
-			}
-		}
-
+		
 		for (int i = 0; i < T; ++i) {
-			for (int j = 0; j < V; ++j) {
-				tphi[i][j] = (countTVW[i][j] + tbeta[j]) / (countTW[i] + tbetaSum);
+			for (int j = 0; j < T; ++j) {
+				this.phi[i][j] = (countTVW[i][j] + beta[j]) / (countTW[i] + betaSum);
 			}
 		}
-
+		
+		for (int i = 0; i < V; ++i) {
+			this.rphi[i] = (countVWr[i] + rbeta[i]) / (countWr + rbetaSum);
+			this.bphi[i] = (countVWb[i] + bbeta[i]) / (countWb + bbetaSum);
+		}
+		
 		for (int i = 0; i < U; ++i) {
 			for (int j = 0; j < 2; ++j) {
-				lambda[i][j] = (countU2R[i][j] + gamma[j]) / (countU2R[i][0] + countU2R[i][1] + gammaSum);
+				this.pi[i][j] = (countU2S[i][j] + gamma[j]) / (countU2S[i][0] + countU2S[i][1] + gammaSum);
+				this.eta[i][j] = (countU2W[i][j] + lambda[j]) / (countU2W[i][0] + countU2W[i][1] + lambdaSum);
 			}
 		}
-
-		for (int i = 0; i < U; ++i) {
-			for (int j = 0; j < S; ++j) {
-				seta[i][j] = (countUSW[i][j] + salpha[j]) / (countU2W[i][0] + salphaSum);
-			}
-		}
-
-		for (int i = 0; i < U; ++i) {
-			for (int j = 0; j < T; ++j) {
-				teta[i][j] = (countUTW[i][j] + talpha[j]) / (countU2W[i][1] + talphaSum);
-			}
-		}
+		
 		System.out.println("End update distribution.");
 
 	}
