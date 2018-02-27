@@ -1,7 +1,7 @@
 package common;
 
 public class MathUtil {
-	public int sample(double[] raw) {
+	public static int sample(double[] raw) {
 		for (int i = 1; i < raw.length; ++i) {
             raw[i] += raw[i] + raw[i - 1];
         }

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import common.ComUtil;
+import common.MathUtil;
 
 public class Model {
 	ArrayList<Post> posts;
@@ -216,6 +217,7 @@ public class Model {
 						// do sth
 					}
 				} else {
+					z[i][j] = -1;
 					this.countU2S[reply.author][0] ++;
 					
 					for (int k = 0; k < reply.content.length; ++k) {
@@ -294,80 +296,139 @@ public class Model {
 		for (int i = 0; i < this.posts.size(); ++i) {
 			System.out.println("sample post " + i);
 			Post post = posts.get(i);
-			Content rootPost = post.contents.get(0);
-			for (int j = 0; j < rootPost.content.length; ++j) {
-				sampleRootWords(i, j, rootPost.content[j]);
+			for (int j = 0; j < post.contents.size(); ++j) {
+				Content reply = post.contents.get(j);
+				sampleReply(i, j, reply);
+				for (int k = 0; k < reply.content.length; ++k) {
+					int word = reply.content[k];
+					sampleWords(i, j, k, word, reply);
+				}
 			}
-			for (int j = 1; j < post.contents.size(); ++j) {
-				// do sth
-				sampleReply(i, j - 1, post.contents.get(j));
-			}
-
 		}
+	}
+
+	private void sampleWords(int p, int s, int n, int word, Content reply) {
+		boolean rstT = t[p][s][n];
+		boolean rstR = r[p][s];
+		int rstZ = z[p][s];
+		int u = reply.author;
+		
+		
+		if (rstT == true) {
+			this.countU2W[u][1] --;
+			if (rstR == true) {
+				this.countTVW[rstZ][word] --;
+				this.countTW[rstZ] --;
+			} else {
+				this.countVWr[word] --;
+				this.countWr --;
+			}
+		} else {
+			this.countU2W[u][0] --;
+			this.countVWb[word] --;
+			this.countWb --;
+		}
+		
+		double[] topicP;
+		topicP = new double[2];
+		
+		topicP[0] = (countU2W[u][0] + lambda[0])
+				* (countVWb[word] + bbeta[word])
+				/ (countWb + bbetaSum);
+		
+		if (rstR == true) {
+			topicP[1] = (countU2W[u][1] + lambda[1])
+					* (countTVW[rstZ][word] + beta[word])
+					/ (countTW[rstZ] + betaSum);
+		} else {
+			topicP[1] = (countU2W[u][1] + lambda[1])
+					* (countVWr[word] + rbeta[word])
+					/ (countWr + rbetaSum);
+		}
+		
+		if (topicP[0] > topicP[1]) {
+			rstT = false;
+		} else {
+			rstT = true;
+		}
+		
+		// recover
+		if (rstT == true) {
+			this.countU2W[u][1] ++;
+			if (rstR == true) {
+				this.countTVW[rstZ][word] ++;
+				this.countTW[rstZ] ++;
+			} else {
+				this.countVWr[word] ++;
+				this.countWr ++;
+			}
+		} else {
+			this.countU2W[u][0] ++;
+			this.countVWb[word] ++;
+			this.countWb ++;
+		}
+		
 	}
 
 	private void sampleReply(int p, int w, Content content) {
 		// TODO Auto-generated method stub
-		boolean rstX = x[p][w];
-		short rstZ = zr[p][w];
+		boolean rstR = r[p][w];
+		short rstZ = z[p][w];
 
+		if (rstR) {
+			this.countU2S[content.author][0] --;
+			this.countPTS[p][rstZ] --;
+			this.countPS[p] --;
+		} else {
+			this.countU2S[content.author][1] --;
+		}
+		
 		for (int i = 0; i < content.content.length; ++i) {
 			int word = content.content[i];
-			if (rstX == false) {
-				countSVW[rstZ][word]--;
-				countSW[rstZ]--;
-				countU2W[content.author][0]--;
-				countUSW[content.author][rstZ]--;
-			} else {
-				countTVW[rstZ][word]--;
-				countTW[rstZ]--;
-				countU2W[content.author][1]--;
-				countUTW[content.author][rstZ]--;
+			if (t[p][w][i] == true) {
+				if (rstR) {
+					this.countTW[rstZ] --;
+					this.countTVW[rstZ][word] --;
+				} else {
+					this.countWr --;
+					this.countVWr[word] --;
+				}
 			}
-		}
-
-		// -- sample
-		if (rstX == false) {
-			countU2R[content.author][0]--;
-		} else {
-			countU2R[content.author][1]--;
 		}
 
 		int rst = drawReply(p, w, content);
-
-		if (rst < S) {
-			rstX = false;
-			rstZ = (short) rst;
+		
+		if (rst == T) {
+			rstR = false;
+			rstZ = -1;
 		} else {
-			rstX = true;
-			rstZ = (short) (rst - S);
+			rstR = true;
+			rstZ = (short)rst;
 		}
-
-		x[p][w] = rstX;
-		zr[p][w] = rstZ;
-
-		// System.out.println("r z == " + rstZ);
+		
+		r[p][w] = rstR;
+		z[p][w] = rstZ;
 
 		// recover
+		if (rstR) {
+			this.countU2S[content.author][0] ++;
+			this.countPTS[p][rstZ] ++;
+			this.countPS[p] ++;
+		} else {
+			this.countU2S[content.author][1] ++;
+		}
+		
 		for (int i = 0; i < content.content.length; ++i) {
 			int word = content.content[i];
-			if (rstX == false) {
-				countSVW[rstZ][word]++;
-				countSW[rstZ]++;
-				countU2W[content.author][0]++;
-				countUSW[content.author][rstZ]++;
-			} else {
-				countTVW[rstZ][word]++;
-				countTW[rstZ]++;
-				countU2W[content.author][1]++;
-				countUTW[content.author][rstZ]++;
+			if (t[p][w][i] == true) {
+				if (rstR) {
+					this.countTW[rstZ] ++;
+					this.countTVW[rstZ][word] ++;
+				} else {
+					this.countWr ++;
+					this.countVWr[word] ++;
+				}
 			}
-		}
-
-		if (rstX == false) {
-			countU2R[content.author][0]++;
-		} else {
-			countU2R[content.author][1]++;
 		}
 
 	}
@@ -375,33 +436,29 @@ public class Model {
 	private int drawReply(int p, int w, Content content) {
 		// TODO Auto-generated method stub
 		int word;
-		int[] pCount = new int[T + S];
+		int[] pCount = new int[T+1];
 
 		HashMap<Integer, Integer> wordCnt = new HashMap<Integer, Integer>();
 		for (int i = 0; i < content.content.length; ++i) {
 			word = content.content[i];
-			if (!wordCnt.containsKey(word)) {
-				wordCnt.put(word, 1);
-			} else {
-				int count = wordCnt.get(word) + 1;
-				wordCnt.put(word, count);
+			if (t[p][w][i] == true) {
+				if (!wordCnt.containsKey(word)) {
+					wordCnt.put(word, 1);
+				} else {
+					int count = wordCnt.get(word) + 1;
+					wordCnt.put(word, count);
+				}
 			}
 		}
 
 		double[] topicP;
-		topicP = new double[S + T];
+		topicP = new double[T+1];
 		int u = content.author;
 
-		for (int i = 0; i < S; ++i) {
-			topicP[i] = (countU2R[u][0] + gamma[0]) * (countUSW[u][i] + salpha[i]) / (countU2W[u][0] + salphaSum);
-			// System.out.println("topic i == " + topicP[i]);
-
-			// if(topicP[i] < 0) {
-			// System.out.println(countU2R[u][0]);
-			// System.out.println(countUSW[u][i]);
-			// System.out.println(countU2W[u][0]);
-			// System.out.println("topic i == " + topicP[i]);
-			// }
+		for (int i = 0; i < T; ++i) {
+			topicP[i] = (countU2S[u][1] + gamma[1])
+					* (countPTS[p][i] + alpha[i])
+					/ (countPS[p] + alphaSum);
 
 			int t = 0;
 			Set s = wordCnt.entrySet();
@@ -413,7 +470,7 @@ public class Model {
 				word = (Integer) m.getKey();
 				int count = (Integer) m.getValue();
 				for (int j = 0; j < count; ++j) {
-					double value = (countSVW[i][word] + sbeta[word] + j) / (countSW[i] + sbetaSum + t);
+					double value = (countTVW[i][word] + beta[word] + j) / (countTW[i] + betaSum + t);
 					t++;
 					// System.out.println("value == " + value);
 					bufferP *= value;
@@ -425,12 +482,9 @@ public class Model {
 			topicP[i] *= Math.pow(bufferP, 1.0);
 		}
 
-		for (int i = 0; i < T; ++i) {
+		for (int i = 0; i < 1; ++i) {
 			// lost some thing
-			topicP[S + i] = (countU2R[u][1] + gamma[1]) * (countUTW[u][i] + talpha[i]) / (countU2W[u][1] + talphaSum)
-					* (countPTW[p][i] + countPTR[p][i] + zalpha[i])
-					/ (posts.get(p).contents.get(0).content.length + posts.get(p).contents.size() - 1 - 1 + zalphaSum);
-			// System.out.println("topic i == " + topicP[S+i]);
+			topicP[T] = (countU2S[u][0] + gamma[0]);
 
 			int t = 0;
 			Set s = wordCnt.entrySet();
@@ -441,13 +495,13 @@ public class Model {
 				word = (Integer) m.getKey();
 				int count = (Integer) m.getValue();
 				for (int j = 0; j < count; ++j) {
-					double value = (countTVW[i][word] + tbeta[word] + j) / (countTW[i] + tbetaSum + t);
+					double value = (countVWr[word] + rbeta[word] + j) / (countWr + rbetaSum + t);
 					t++;
 					bufferP *= value;
-					bufferP = isOverFlow(bufferP, pCount, S + i);
+					bufferP = isOverFlow(bufferP, pCount, T);
 				}
 			}
-			topicP[S + i] *= Math.pow(bufferP, 1.0);
+			topicP[T] *= Math.pow(bufferP, 1.0);
 		}
 
 		reComputeProbs(topicP, pCount);
@@ -456,19 +510,7 @@ public class Model {
 		// System.out.print(" " + topicP[i]);
 		// }
 		// System.out.println("");
-
-		for (int i = 1; i < T + S; ++i) {
-			topicP[i] += topicP[i - 1];
-		}
-		double rand = Math.random() * topicP[T + S - 1];
-		int rst = 0;
-		for (int i = 0; i < T + S; ++i) {
-			if (topicP[i] >= rand) {
-				rst = i;
-				break;
-			}
-		}
-
+		int rst = MathUtil.sample(topicP);
 		return rst;
 	}
 
@@ -505,50 +547,6 @@ public class Model {
 			return bufferP * 1e150;
 		}
 		return bufferP;
-	}
-
-	private void sampleRootWords(int i, int j, int word) {
-		// TODO Auto-generated method stub
-		short z = zw[i][j];
-		countPTW[i][z]--;
-		countTVW[z][word]--;
-		countTW[z]--;
-
-		z = drawZ(i, j, word);
-
-		zw[i][j] = z;
-		countPTW[i][z]++;
-		countTVW[z][word]++;
-		countTW[z]++;
-
-	}
-
-	private short drawZ(int p, int w, int word) {
-		// TODO Auto-generated method stub
-		double[] topicP;
-		topicP = new double[T];
-
-		for (int i = 0; i < T; ++i) {
-			topicP[i] = (countPTW[p][i] + countPTR[p][i] + zalpha[i])
-					/ (posts.get(p).contents.get(0).content.length + posts.get(p).contents.size() - 1 - 2 + zalphaSum)
-					* (countTVW[i][word] + tbeta[i]) / (countTW[i] + tbetaSum);
-
-		}
-
-		for (int i = 1; i < T; ++i) {
-			topicP[i] += topicP[i - 1];
-		}
-
-		double rand = Math.random() * topicP[T - 1];
-		short topic = 0;
-		for (short i = 0; i < T; ++i) {
-			if (rand <= topicP[i]) {
-				topic = i;
-				break;
-			}
-		}
-
-		return topic;
 	}
 
 	public void outputResult(String filename, ArrayList<String> wordList) throws IOException {
