@@ -47,16 +47,15 @@ public class Model {
 	float[][] pi;
 	float[][] eta;
 
-	// int[][] countPTW; // only for root post
-	// int[][] countTVW;
-	// int[][] countPTR;
-	// int[] countTW;
-	// int[] countSW;
-	// int[][] countU2R;
-	// int[][] countUTW;
-	// int[][] countUSW;
-	// int[][] countU2W;
-	// int[][] countSVW;
+	int[][] countU2S;
+	int[][] countPTS;
+	int[] countPS;
+	int[] countTW;
+	int[][] countTVW;
+	int countWr;
+	int[] countVWr;
+	int[][] countU2W;
+	
 
 	public Model(ModelParams modelParams, ArrayList<Post> posts) {
 		// TODO Auto-generated constructor stub
@@ -104,34 +103,50 @@ public class Model {
 		}
 
 		this.theta = new float[P][T];
+		this.countPTS = new int[P][T];
+		this.countPS = new int[P];
 		for (int i = 0; i < P; ++i) {
+			this.countPS[i] = 0;
 			for (int j = 0; j < T; ++j) {
 				this.theta[i][j] = 0;
+				this.countPTS[i][j] = 0;
 			}
 		}
 
 		this.phi = new float[T][V];
+		this.countTW = new int[T];
+		this.countTVW = new int[T][V];
 		for (int i = 0; i < T; ++i) {
+			this.countTW[i] = 0;
 			for (int j = 0; j < V; ++j) {
 				this.phi[i][j] = 0;
+				this.countTVW[i][j] = 0;
 			}
 		}
 
 		this.bphi = new float[V];
 		this.rphi = new float[V];
+		this.countVWr = new int[V];
 		for (int i = 0; i < V; ++i) {
+			this.countVWr[i] = 0;
 			this.bphi[i] = 0;
 			this.rphi[i] = 0;
 		}
 
 		this.pi = new float[U][2];
 		this.eta = new float[U][2];
+		this.countU2S = new int[U][2];
+		this.countU2W = new int[U][2];
 		for (int i = 0; i < U; ++i) {
 			for (int j = 0; j < 2; ++j) {
 				this.pi[i][j] = 0;
 				this.eta[i][j] = 0;
+				this.countU2S[i][j] = 0;
+				this.countU2W[i][j] = 0;
 			}
 		}
+		
+		this.countWr = 0;
 
 	}
 
@@ -173,27 +188,39 @@ public class Model {
 						}
 					}
 					z[i][j] = tp;
+					
+					this.countU2S[reply.author][1] ++;
+					this.countPTS[i][tp] ++;
+					this.countPS[i] ++;
 
 					for (int k = 0; k < reply.content.length; ++k) {
 						int word = reply.content[k];
 						rand = Math.random();
 						if (rand < 0.5) {
 							t[i][j][k] = false;
+							// background word
+							this.countU2W[reply.author][0] ++;
 						} else {
 							t[i][j][k] = true;
+							this.countTW[tp] ++;
+							this.countTVW[tp][word] ++;
+							this.countU2W[reply.author][1] ++;
 						}
 						// do sth
 					}
 				} else {
-
+					this.countU2S[reply.author][0] ++;
+					
 					for (int k = 0; k < reply.content.length; ++k) {
 						int word = reply.content[k];
 						rand = Math.random();
 						if (rand < 0.5) {
 							t[i][j][k] = false;
-							
+							this.countU2W[reply.author][0] ++;
 						} else {
 							t[i][j][k] = true;
+							this.countWr ++;
+							this.countVWr[word] ++;
 						}
 
 					}
