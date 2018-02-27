@@ -5,8 +5,7 @@ import java.util.HashMap;
 
 public class Post {
 	int id;
-	boolean fix;
-	boolean type;
+
 	ArrayList<Content> contents = new ArrayList<Content>();
 	
 	public Post(ArrayList<String> tPost, HashMap<String, Integer> wordMap, 

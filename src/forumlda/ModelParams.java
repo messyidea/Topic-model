@@ -13,6 +13,7 @@ public class ModelParams {
 	float alpha;
 	float beta;
 	float gamma;
+	float lambda;
 	
 	int iteration;
 	int topNum;
