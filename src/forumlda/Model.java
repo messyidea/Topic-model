@@ -180,6 +180,10 @@ public class Model {
 				} else {
 					bufferX = false;
 				}
+				
+				if (reply.fix == true) {
+					bufferX = reply.type;
+				}
 
 				r[i][j] = bufferX;
 				if (bufferX == true) {
@@ -298,7 +302,9 @@ public class Model {
 			Post post = posts.get(i);
 			for (int j = 0; j < post.contents.size(); ++j) {
 				Content reply = post.contents.get(j);
-				sampleReply(i, j, reply);
+				if (!reply.fix) {
+					sampleReply(i, j, reply);
+				}
 				for (int k = 0; k < reply.content.length; ++k) {
 					int word = reply.content[k];
 					sampleWords(i, j, k, word, reply);
