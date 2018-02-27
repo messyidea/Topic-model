@@ -84,7 +84,7 @@ public class ForumLdaMain {
 				if(post.id != -1) {
 					posts.add(post);
 					
-					if (posts.size() > 30 ) {
+					if (posts.size() > 50 ) {
 						break;	// limit post size, for test
 					}
 					

@@ -182,6 +182,8 @@ public class Model {
 				}
 				
 				if (reply.fix == true) {
+//					System.out.println("fix!!!!!!!!!!");
+//					System.exit(1);
 					bufferX = reply.type;
 				}
 
@@ -274,7 +276,7 @@ public class Model {
 		}
 		
 		for (int i = 0; i < T; ++i) {
-			for (int j = 0; j < T; ++j) {
+			for (int j = 0; j < V; ++j) {
 				this.phi[i][j] = (countTVW[i][j] + beta[j]) / (countTW[i] + betaSum);
 			}
 		}
@@ -610,8 +612,7 @@ public class Model {
 			ComUtil.getTop(phi[i], rankList, topNum);
 
 			for (int j = 0; j < rankList.size(); ++j) {
-				// System.out.println("ranklist " + j + " == " +
-				// rankList.get(j));
+				System.out.println("ranklist " + j + " == " + rankList.get(j));
 				String tmp = "\t" + wordList.get(rankList.get(j)) + "\t" + phi[i][rankList.get(j)];
 				writer.write(tmp + "\n");
 			}
@@ -644,6 +645,18 @@ public class Model {
 				writer.write(tmp + "\n");
 			}
 		}
+		
+//		for (int i = 0; i < P; ++i) {
+//			Post post = posts.get(i);
+//			for (int j = 0; j < post.contents.size(); ++j) {
+////				System.out.print("  " + z[i][j]);
+//				Content reply = post.contents.get(j);
+//				for (int k = 0; k < reply.content.length; ++k) {
+//					System.out.println("  " + t[i][j][k]);
+//				}
+//			}
+//			System.out.println();
+//		}
 
 		writer.flush();
 		writer.close();
