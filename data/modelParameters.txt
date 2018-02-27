@@ -2,5 +2,6 @@ topics:10
 alpha:0.1
 beta:0.1
 gamma:20
+lambda:20
 iteration:20
 top_num:10

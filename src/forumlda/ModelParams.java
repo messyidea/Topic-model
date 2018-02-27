@@ -41,6 +41,9 @@ public class ModelParams {
 			case "gamma":
 				this.gamma = Float.parseFloat(value);
 				break;
+			case "lambda":
+				this.lambda = Float.parseFloat(value);
+				break;
 			case "iteration":
 				this.iteration = Integer.parseInt(value);
 				break;
@@ -67,6 +70,7 @@ public class ModelParams {
 		System.out.println("alpha: " + Float.toString(this.alpha));
 		System.out.println("beta: " + Float.toString(this.beta));
 		System.out.println("gamma: " + Float.toString(this.gamma));
+		System.out.println("lambda: " + Float.toString(this.lambda));
 		System.out.println("iteration: " + Integer.toString(this.iteration));
 		System.out.println("top_num: " + Integer.toString(this.topNum));
 		System.out.println("authorNum: " + Integer.toString(this.U));
