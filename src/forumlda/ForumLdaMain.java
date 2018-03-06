@@ -84,7 +84,8 @@ public class ForumLdaMain {
 				if(post.id != -1) {
 					posts.add(post);
 					
-					if (posts.size() > 50 ) {
+					System.out.println(posts.size());
+					if (posts.size() > 100 ) {
 						break;	// limit post size, for test
 					}
 					
@@ -93,6 +94,8 @@ public class ForumLdaMain {
 			} 
 			tPost.add(line);
 		}
+		
+		System.out.println("post size: " + posts.size());
 		
 //		System.out.println("start check");
 //		for (int i = 0; i < 2; ++i) {

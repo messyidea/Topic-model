@@ -300,7 +300,7 @@ public class Model {
 	public void oneIter() {
 
 		for (int i = 0; i < this.posts.size(); ++i) {
-			System.out.println("sample post " + i);
+//			System.out.println("sample post " + i);
 			Post post = posts.get(i);
 			for (int j = 0; j < post.contents.size(); ++j) {
 				Content reply = post.contents.get(j);
@@ -386,11 +386,11 @@ public class Model {
 		short rstZ = z[p][w];
 
 		if (rstR) {
-			this.countU2S[content.author][0] --;
+			this.countU2S[content.author][1] --;
 			this.countPTS[p][rstZ] --;
 			this.countPS[p] --;
 		} else {
-			this.countU2S[content.author][1] --;
+			this.countU2S[content.author][0] --;
 		}
 		
 		for (int i = 0; i < content.content.length; ++i) {
@@ -417,6 +417,7 @@ public class Model {
 		
 
 		int rst = drawReply(p, w, content);
+//		System.out.println("rst == " + rst);
 		
 		if (rst == T) {
 			rstR = false;
@@ -433,12 +434,15 @@ public class Model {
 		z[p][w] = rstZ;
 
 		// recover
+//		System.out.println("rstR: " + rstR);
+//		System.out.println("rstZ: " + rstZ);
+//		System.out.println("author: " + content.author);
 		if (rstR) {
-			this.countU2S[content.author][0] ++;
+			this.countU2S[content.author][1] ++;
 			this.countPTS[p][rstZ] ++;
 			this.countPS[p] ++;
 		} else {
-			this.countU2S[content.author][1] ++;
+			this.countU2S[content.author][0] ++;
 		}
 		
 		for (int i = 0; i < content.content.length; ++i) {
@@ -476,13 +480,21 @@ public class Model {
 
 		double[] topicP;
 		topicP = new double[T+1];
+//		double[] topicPpre = new double[T+1];
+//		double[] mess = new double[T+1];
+//		double[] mess1 = new double[T+1];
+//		double[] mess2 = new double[T+1];
+//		double[] mess3 = new double[T+1];
 		int u = content.author;
 
 		for (int i = 0; i < T; ++i) {
 			topicP[i] = (countU2S[u][1] + gamma[1])
 					* (countPTS[p][i] + alpha[i])
 					/ (countPS[p] + alphaSum);
-			
+//			mess[i] = topicP[i];
+//			mess1[i] = countU2S[u][1];
+//			mess2[i] = countPTS[p][i];
+//			mess3[i] = countPS[p];
 //			System.out.println("------");
 //			System.out.println("  " + topicP[i]);
 
@@ -528,6 +540,10 @@ public class Model {
 		for (int i = 0; i < 1; ++i) {
 			// lost some thing
 			topicP[T] = (countU2S[u][0] + gamma[0]);
+//			mess[T] = topicP[T];
+//			mess1[i] = countU2S[u][0];
+//			mess2[i] = countU2S[u][0];
+//			mess3[i] = countU2S[u][0];
 
 			int t = 0;
 			Set s = wordCnt.entrySet();
@@ -552,7 +568,9 @@ public class Model {
 //			System.out.print(" " + topicP[i]);
 //		}
 //		System.out.println();
-
+//		for (int i = 0; i < topicP.length; ++i) {
+//			topicPpre[i] = topicP[i];
+//		}
 		reComputeProbs(topicP, pCount);
 
 		// for (int i = 0; i < T+S; ++i) {
@@ -560,6 +578,36 @@ public class Model {
 		// }
 		// System.out.println("");
 		int rst = MathUtil.sample(topicP);
+//		if (rst == -2) {
+//			for(int i = 0; i < mess.length; ++i) {
+//				System.out.print("  " + mess[i]);
+//			}
+//			System.out.println();
+//			for(int i = 0; i < mess1.length; ++i) {
+//				System.out.print("  " + mess1[i]);
+//			}
+//			System.out.println();
+//			for(int i = 0; i < mess2.length; ++i) {
+//				System.out.print("  " + mess2[i]);
+//			}
+//			System.out.println();
+//			for(int i = 0; i < mess3.length; ++i) {
+//				System.out.print("  " + mess3[i]);
+//			}
+//			System.out.println();
+//			for(int i = 0; i < pCount.length; ++i) {
+//				System.out.print("  " + pCount[i]);
+//			}
+//			System.out.println();
+//			for(int i = 0; i < topicPpre.length; ++i) {
+//				System.out.print("  " + topicPpre[i]);
+//			}
+//			System.out.println();
+//			for(int i = 0; i < topicP.length; ++i) {
+//				System.out.print("  " + topicP[i]);
+//			}
+//			System.out.println();
+//		}
 		return rst;
 	}
 
@@ -622,7 +670,7 @@ public class Model {
 		for (int i = 0; i < 1; ++i) {
 			rankList.clear();
 
-			ComUtil.getTop(rphi, rankList, topNum);
+			ComUtil.getTop(rphi, rankList, 50);
 
 			for (int j = 0; j < rankList.size(); ++j) {
 				// System.out.println("ranklist " + j + " == " +
@@ -636,7 +684,7 @@ public class Model {
 		for (int i = 0; i < 1; ++i) {
 			rankList.clear();
 
-			ComUtil.getTop(bphi, rankList, topNum);
+			ComUtil.getTop(bphi, rankList, 50);
 
 			for (int j = 0; j < rankList.size(); ++j) {
 				// System.out.println("ranklist " + j + " == " +
