@@ -22,6 +22,7 @@ public class ForumLdaMain {
 		String modelParamsFile = base + "/modelParameters.txt";
 		String stopWordsFile = base + "/stopwords.txt";
 		String wordsOfTopics = resDir + "wordsoftopics.rst";
+		String wordsOfTopicsTag = resDir + "result.rst";
 		
 		//CLI parse
 		Options options = new Options();
@@ -66,6 +67,7 @@ public class ForumLdaMain {
 		m.estimate();
 		
 		m.outputResult(wordsOfTopics, wordList);
+		m.outputTopicResult(wordsOfTopicsTag, wordList);
 		
 	}
 	
@@ -81,11 +83,12 @@ public class ForumLdaMain {
 			String line = lines.get(i);
 			if (line.startsWith("-") || line.length() == 0) {
 				Post post = new Post(tPost, wordMap, wordList, authorMap, authorList);
+				tPost.clear();
 				if(post.id != -1) {
 					posts.add(post);
 					
 					System.out.println(posts.size());
-					if (posts.size() > 100 ) {
+					if (posts.size() > 600 ) {
 						break;	// limit post size, for test
 					}
 					

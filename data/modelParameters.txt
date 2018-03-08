@@ -1,7 +1,7 @@
-topics:100
+topics:20
 alpha:0.1
 beta:0.01
 gamma:10
 lambda:10
-iteration:50
+iteration:100
 top_num:20

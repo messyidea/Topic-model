@@ -98,8 +98,10 @@ public class Model {
 		this.lambda = new float[2];
 		this.gammaSum = 0;
 		this.lambdaSum = 0;
+		this.gamma[0] = 1;
+		this.gamma[1] = 10;
 		for (int i = 0; i < 2; ++i) {
-			this.gamma[i] = modelParams.gamma;
+//			this.gamma[i] = modelParams.gamma;
 			this.gammaSum += this.gamma[i];
 			this.lambda[i] = modelParams.lambda;
 			this.lambdaSum += this.lambda[i];
@@ -705,6 +707,31 @@ public class Model {
 //			}
 //			System.out.println();
 //		}
+
+		writer.flush();
+		writer.close();
+
+	}
+	
+	public void outputTopicResult(String filename, ArrayList<String> wordList) throws IOException {
+		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filename)));
+
+		for (int i = 0; i < posts.size(); ++i) {
+			Post post = posts.get(i);
+			for (int j = 0; j < post.contents.size(); ++j) {
+				Content cc = post.contents.get(j);
+				writer.write("" + z[i][j] + "  :");
+				for (int k = 0; k < cc.content.length; ++k) {
+					if (t[i][j][k]) {
+						writer.write("  " + wordList.get(cc.content[k]) + "1");
+					} else {
+						writer.write("  " + wordList.get(cc.content[k]) + "0");
+					}
+				}
+				writer.write("\n");
+			}
+			writer.write("\n------------------------------------------\n");
+		}
 
 		writer.flush();
 		writer.close();
